@@ -8,6 +8,7 @@
  * @license https://opensource.org/licenses/afl-3.0.php
  */
 include_once(dirname(__FILE__).'/../../model/ConsumeRest.php');
+include_once(dirname(__FILE__).'/../../model/Transaction.php');
 
 class RedebanglobalpayValidationModuleFrontController extends ModuleFrontController
 {
@@ -44,7 +45,7 @@ class RedebanglobalpayValidationModuleFrontController extends ModuleFrontControl
          * Place the order
          */
         $statuOrder        =   Tools::getValue('statepayment', Configuration::get('statepayment'));
-        if(!isset($statuOrder) || $statuOrder==null || empty($statuOrder)){
+        if (!isset($statuOrder) || $statuOrder==null || empty($statuOrder)) {
             $statuOrder=2;
         }
         $this->module->validateOrder(
@@ -58,14 +59,13 @@ class RedebanglobalpayValidationModuleFrontController extends ModuleFrontControl
             false,
             $customer->secure_key
         );
-        if ($cart->OrderExists() == true){
+        if ($cart->OrderExists() == true) {
             $orderId = Order::getOrderByCartId((int)$cart->id);
         }
 
         /**
          * Redirect the customer to the order confirmation page
          */
-
 
         $this->context->smarty->assign(
             array(
@@ -82,11 +82,13 @@ class RedebanglobalpayValidationModuleFrontController extends ModuleFrontControl
         $rest = new ConsumeRest($uri, $method);
         $token = $rest->createToken($appCode, $appKey);
         $rest->setContentType('application/json');
-        $rest->addHeader('auth-token',$token);
-        $successUri = 'index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key;
+        $rest->addHeader('auth-token', $token);
+        $successUri = 'index.php?controller=order-confirmation&id_cart='.
+        (int)$cart->id.'&id_module='.
+        (int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key;
         $order = new Order((int) $this->module->currentOrder);
         $customer = new Customer($order->id_customer);
-        $total = number_format($order->total_paid,0,'','');
+        $total = number_format($order->total_paid, 0, '', '');
         $data = [
             'user' => [
                 'id'=>$order->id_customer,
@@ -113,14 +115,21 @@ class RedebanglobalpayValidationModuleFrontController extends ModuleFrontControl
         ];
         $rest->setParams($data);
         $result = $rest->execute();
-        if(
-            isset($result['success'])
+        $transaction = new Transaction();
+        $transaction->setOrderId((int) $this->module->currentOrder);
+        $transaction->setOrderReference($order->reference);
+        $transaction->setRequest(json_encode($data));
+        $transaction->setResponse(json_encode($result));
+        if (isset($result['success'])
             && $result['success']
-        ){
+        ) {
             $urlPayment = $result['data']->payment->payment_url;
+            $transaction->setLinkPago($urlPayment);
+            $transaction->create();
             Tools::redirect($urlPayment);
         } else {
             $baseUrl = Context::getContext()->shop->getBaseURL(true);
+            $transaction->create();
             Tools::redirect($baseUrl.'module/redebanglobalpay/failed');
         }
     }

@@ -258,7 +258,6 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         } catch (Exception $err) {
             $msg = $err->getMessage();
         }
-        
         return true;
     }
 }

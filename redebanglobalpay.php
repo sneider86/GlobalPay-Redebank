@@ -35,12 +35,13 @@ class Redebanglobalpay extends PaymentModule
 {
 
     protected $_html = '';
-    protected $_postErrors = array();
+    protected $_postErrors = [];
 
     public $details;
     public $owner;
     public $address;
     public $extra_mail_vars;
+    protected $tableTransaction = 'eres_global_transaction';
 
     public function __construct()
     {
@@ -66,12 +67,34 @@ class Redebanglobalpay extends PaymentModule
         return parent::install()
             && $this->registerHook('paymentOptions')
             && $this->registerHook('paymentReturn')
-            && $this->registerHook('addWebserviceResources');
+            && $this->registerHook('addWebserviceResources')
+            && $this->installDb();
     }
 
     public function uninstall()
     {
-        return parent::uninstall();
+        return parent::uninstall()
+            && $this->deleteDb();
+    }
+
+    public function installDb()
+    {
+        Db::getInstance()->execute('
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.$this->tableTransaction.'` (
+			`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `order_id` int(11) NOT NULL,
+            `order_reference` VARCHAR(99) NOT NULL,
+            `url_link_pago` VARCHAR( 255 ) NOT NULL,
+            `request` text,
+            `response` text,
+			INDEX (`order_reference`)
+		) ENGINE = '._MYSQL_ENGINE_.' CHARACTER SET utf8 COLLATE utf8_general_ci;');
+        return true;
+    }
+    public function deleteDb()
+    {
+        Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.$this->tableTransaction);
+        return true;
     }
 
     public function hookPaymentOptions($params)
@@ -143,11 +166,10 @@ class Redebanglobalpay extends PaymentModule
 
         if (Tools::isSubmit('submit'.$this->name)) {
             $validation = true;
-            foreach($fields as $field){
+            foreach ($fields as $field) {
                 $myModuleName = strval(Tools::getValue($field));
 
-                if (
-                    !$myModuleName ||
+                if (!$myModuleName ||
                     empty($myModuleName) ||
                     !Validate::isGenericName($myModuleName)
                 ) {
@@ -158,7 +180,7 @@ class Redebanglobalpay extends PaymentModule
                     Configuration::updateValue($field, $myModuleName);
                 }
             }
-            if($validation){
+            if ($validation) {
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
@@ -185,7 +207,7 @@ class Redebanglobalpay extends PaymentModule
 
         $states = new OrderState(1);
         $states2 = $states->getOrderStates(1);
-        foreach($states2 as $statu){
+        foreach ($states2 as $statu) {
             $optionsStatus[] = [
                 'id_option' => $statu['id_order_state'],
                 'name' => $statu['name']
@@ -290,10 +312,9 @@ class Redebanglobalpay extends PaymentModule
             ]
         ];
         // Load current value
-        foreach($fields as $field){
+        foreach ($fields as $field) {
             $helper->fields_value[$field] = Tools::getValue($field, Configuration::get($field));
         }
-        
 
         return $helper->generateForm($fieldsForm);
     }
