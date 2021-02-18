@@ -74,6 +74,7 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         $transaction->setOrderId(0);
         $transaction->setOrderReference($reference);
         $transaction->setRequest(json_encode($input));
+        $transaction->setResponse('La orden ha sido confirmada.');
         if (!$vToken) {
             $this->getWsObject()->setError(200, 'error con el token', 203);
             $transaction->setResponse('error con el token');
@@ -95,7 +96,6 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             'code' => '200',
             'message' => 'La orden ha sido confirmada.'
         ];
-        $transaction->setResponse('La orden ha sido confirmada.');
         $transaction->create();
         $json = json_encode($objects_data);
         $this->output = $json;
