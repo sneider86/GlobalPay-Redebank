@@ -78,25 +78,27 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         if (!$vToken) {
             $this->getWsObject()->setError(200, 'error con el token', 203);
             $transaction->setResponse('error con el token');
+            $transaction->create();
         }
         $order = $this->getLoadOrderHistoryByReference($reference);
         if (isset($order) && $order && $order->current_state == 2) {
-            $this->getWsObject()->setError(200, 'La orden \''.$reference.'\' ya se encuentra confirmada.', 200);
             $transaction->setResponse('La orden \''.$reference.'\' ya se encuentra confirmada.');
+            $transaction->create();
+            $this->getWsObject()->setError(200, 'La orden \''.$reference.'\' ya se encuentra confirmada.', 200);
         } else {
             $loadOrder = $this->changeOrderHistoryByReference($reference);
             if (!$loadOrder) {
-                $this->getWsObject()->setError(400, 'No se pudo cargar Orden ref :'.$reference, 203);
                 $transaction->setResponse('No se pudo cargar Orden ref :'.$reference);
+                $transaction->create();
+                $this->getWsObject()->setError(400, 'No se pudo cargar Orden ref :'.$reference, 203);
             }
-            
         }
         
         $objects_data = [
             'code' => '200',
             'message' => 'La orden ha sido confirmada.'
         ];
-        $transaction->create();
+        
         $json = json_encode($objects_data);
         $this->output = $json;
     }
