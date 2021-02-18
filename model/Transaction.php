@@ -73,11 +73,10 @@ class Transaction
     }
     public function create()
     {
-        Db::getInstance()->execute("
-        INSERT INTO "._DB_PREFIX_.$this->tableTransaction." 
+        $sql = "INSERT INTO "._DB_PREFIX_.$this->tableTransaction." 
         (order_id,order_reference,url_link_pago,request,response) 
-        VALUE ("
-        .$this->order_id.",'".$this->order_reference."','"
-        .$this->url_link_pago."','".$this->request."','".$this->response."')");
+        VALUE (".$this->order_id.",'".$this->order_reference."','"
+        .$this->url_link_pago."','".$this->request."','".$this->response."')";
+        $result = Db::getInstance()->execute($sql);
     }
 }

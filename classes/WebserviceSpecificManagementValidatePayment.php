@@ -82,7 +82,7 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         }
         $order = $this->getLoadOrderHistoryByReference($reference);
         if (isset($order) && $order && $order->current_state == 2) {
-            $transaction->setResponse('La orden \''.$reference.'\' ya se encuentra confirmada.');
+            $transaction->setResponse('La orden '.$reference.' ya se encuentra confirmada.');
             $transaction->create();
             $this->getWsObject()->setError(200, 'La orden \''.$reference.'\' ya se encuentra confirmada.', 200);
         } else {
