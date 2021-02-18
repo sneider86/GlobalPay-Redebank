@@ -80,7 +80,7 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             $transaction->setResponse('error con el token');
         }
         $order = $this->getLoadOrderHistoryByReference($reference);
-        if ($order->current_state == 2) {
+        if (isset($order) && $order && $order->current_state == 2) {
             $this->getWsObject()->setError(200, 'La orden \''.$reference.'\' ya se encuentra confirmada.', 200);
             $transaction->setResponse('La orden \''.$reference.'\' ya se encuentra confirmada.');
         } else {
