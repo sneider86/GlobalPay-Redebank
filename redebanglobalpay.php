@@ -93,7 +93,7 @@ class Redebanglobalpay extends PaymentModule
     }
     public function deleteDb()
     {
-        Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.$this->tableTransaction);
+        //Db::getInstance()->execute('DROP TABLE '._DB_PREFIX_.$this->tableTransaction);
         return true;
     }
 
