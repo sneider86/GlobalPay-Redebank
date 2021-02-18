@@ -1,6 +1,7 @@
 <?php
 
 include_once(_PS_MODULE_DIR_.'redebanglobalpay/model/ConsumeRest.php');
+include_once(_PS_MODULE_DIR_.'redebanglobalpay/model/Transaction.php');
 
 class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificManagementInterface
 {
@@ -69,16 +70,23 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         $stoken     = $input['transaction']['stoken'];
         $reference  = $input['transaction']['dev_reference'];
         $vToken     = $rest->validateTokenIncoming($transId, $appCode, $userId, $appKey, $stoken);
+        $transaction = new Transaction();
+        $transaction->setOrderId(0);
+        $transaction->setOrderReference($reference);
+        $transaction->setRequest(json_encode($input));
         if (!$vToken) {
             $this->getWsObject()->setError(200, 'error con el token', 203);
+            $transaction->setResponse('error con el token');
         }
         $order = $this->getLoadOrderHistoryByReference($reference);
         if ($order->current_state == 2) {
             $this->getWsObject()->setError(200, 'La orden \''.$reference.'\' ya se encuentra confirmada.', 200);
+            $transaction->setResponse('La orden \''.$reference.'\' ya se encuentra confirmada.');
         } else {
             $loadOrder = $this->changeOrderHistoryByReference($reference);
             if (!$loadOrder) {
                 $this->getWsObject()->setError(400, 'No se pudo cargar Orden ref :'.$reference, 203);
+                $transaction->setResponse('No se pudo cargar Orden ref :'.$reference);
             }
             
         }
@@ -87,6 +95,8 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             'code' => '200',
             'message' => 'La orden ha sido confirmada.'
         ];
+        $transaction->setResponse('La orden ha sido confirmada.');
+        $transaction->create();
         $json = json_encode($objects_data);
         $this->output = $json;
     }
