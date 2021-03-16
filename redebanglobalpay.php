@@ -200,7 +200,7 @@ class Redebanglobalpay extends PaymentModule
                 'name' => 'Integración'    // The value of the text content of the  <option> tag.
             ],
             [
-                'id_option' => 'https://noccapi-stg.globalpay.com.co/linktopay/init_order2/',       // The value of the 'value' attribute of the <option> tag.
+                'id_option' => 'https://noccapi.globalpay.com.co/linktopay/init_order/',       // The value of the 'value' attribute of the <option> tag.
                 'name' => 'Producción'    // The value of the text content of the  <option> tag.
             ]
         ];
