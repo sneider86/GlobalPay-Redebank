@@ -75,11 +75,11 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
         $transaction->setOrderReference($reference);
         $transaction->setRequest(json_encode($input));
         $transaction->setResponse('La orden ha sido confirmada.');
-        if (!$vToken) {
-            $this->getWsObject()->setError(200, 'error con el token', 203);
-            $transaction->setResponse('error con el token');
-            $transaction->create();
-        }
+        // if (!$vToken) {
+        //     $this->getWsObject()->setError(200, 'error con el token', 203);
+        //     $transaction->setResponse('error con el token');
+        //     $transaction->create();
+        // }
         $order = $this->getLoadOrderHistoryByReference($reference);
         if (isset($order) && $order && $order->current_state == 2) {
             $transaction->setResponse('La orden '.$reference.' ya se encuentra confirmada.');
@@ -144,10 +144,10 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             $this->getWsObject()->setError(400, 'Parametro \'date\' no existe', 200);
             return true;
         }
-        if (!isset($input['transaction']['message'])) {
-            $this->getWsObject()->setError(400, 'Parametro \'message\' no existe', 200);
-            return true;
-        }
+        // if (!isset($input['transaction']['message'])) {
+        //     $this->getWsObject()->setError(400, 'Parametro \'message\' no existe', 200);
+        //     return true;
+        // }
         if (!isset($input['transaction']['id'])) {
             $this->getWsObject()->setError(400, 'Parametro \'id\' no existe', 200);
             return true;
@@ -156,22 +156,22 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             $this->getWsObject()->setError(400, 'Parametro \'dev_reference\' no existe', 200);
             return true;
         }
-        if (!isset($input['transaction']['carrier_code'])) {
-            $this->getWsObject()->setError(400, 'Parametro \'carrier_code\' no existe', 200);
-            return true;
-        }
+        // if (!isset($input['transaction']['carrier_code'])) {
+        //     $this->getWsObject()->setError(400, 'Parametro \'carrier_code\' no existe', 200);
+        //     return true;
+        // }
         if (!isset($input['transaction']['amount'])) {
             $this->getWsObject()->setError(400, 'Parametro \'amount\' no existe', 200);
             return true;
         }
-        if (!isset($input['transaction']['paid_date'])) {
-            $this->getWsObject()->setError(400, 'Parametro \'paid_date\' no existe', 200);
-            return true;
-        }
-        if (!isset($input['transaction']['installments'])) {
-            $this->getWsObject()->setError(400, 'Parametro \'paid_date\' no existe', 200);
-            return true;
-        }
+        // if (!isset($input['transaction']['paid_date'])) {
+        //     $this->getWsObject()->setError(400, 'Parametro \'paid_date\' no existe', 200);
+        //     return true;
+        // }
+        // if (!isset($input['transaction']['installments'])) {
+        //     $this->getWsObject()->setError(400, 'Parametro \'paid_date\' no existe', 200);
+        //     return true;
+        // }
         if (!isset($input['transaction']['stoken'])) {
             $this->getWsObject()->setError(400, 'Parametro \'stoken\' no existe', 200);
             return true;
