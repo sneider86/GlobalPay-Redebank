@@ -132,10 +132,10 @@ class WebserviceSpecificManagementValidatePayment implements WebserviceSpecificM
             $this->getWsObject()->setError(400, 'Parametro \'order_description\' no existe', 200);
             return true;
         }
-        if (!isset($input['transaction']['authorization_code'])) {
-            $this->getWsObject()->setError(400, 'Parametro \'authorization_code\' no existe', 200);
-            return true;
-        }
+        // if (!isset($input['transaction']['authorization_code'])) {
+        //     $this->getWsObject()->setError(400, 'Parametro \'authorization_code\' no existe', 200);
+        //     return true;
+        // }
         if (!isset($input['transaction']['status_detail'])) {
             $this->getWsObject()->setError(400, 'Parametro \'status_detail\' no existe', 200);
             return true;
